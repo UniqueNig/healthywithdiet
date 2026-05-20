@@ -1,26 +1,216 @@
 @import "tailwindcss";
 
+/* ----------------------------------------------------------------
+   Light mode (default)
+   ---------------------------------------------------------------- */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --color-bg-base: #faf8f1;
+  --color-bg-alt-base: #f2eee2;
+  --color-surface-base: #ffffff;
+  --color-border-base: #e5e1d4;
+  --color-fg-base: #1a1f15;
+  --color-fg-muted-base: #5c6358;
+  --color-primary-base: #507d2a;
+  --color-primary-deep-base: #2f4a18;
+  --color-primary-fg-base: #ffffff;
+  --color-accent-base: #c97b5c;
+  --color-accent-fg-base: #ffffff;
+  --color-gold-base: #c19236;
 }
 
+/* ----------------------------------------------------------------
+   Dark mode (deep forest, not black)
+   ---------------------------------------------------------------- */
+[data-theme="dark"] {
+  --color-bg-base: #0f1a0b;
+  --color-bg-alt-base: #0a1308;
+  --color-surface-base: #172417;
+  --color-border-base: #283a24;
+  --color-fg-base: #f0ede2;
+  --color-fg-muted-base: #9da395;
+  --color-primary-base: #7ba94a;
+  --color-primary-deep-base: #4a7330;
+  --color-primary-fg-base: #0f1a0b;
+  --color-accent-base: #d68e6c;
+  --color-accent-fg-base: #0f1a0b;
+  --color-gold-base: #d4a056;
+}
+
+/* ----------------------------------------------------------------
+   Expose tokens as Tailwind utilities (bg-bg, text-fg, etc.)
+   ---------------------------------------------------------------- */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-bg: var(--color-bg-base);
+  --color-bg-alt: var(--color-bg-alt-base);
+  --color-surface: var(--color-surface-base);
+  --color-border: var(--color-border-base);
+  --color-fg: var(--color-fg-base);
+  --color-fg-muted: var(--color-fg-muted-base);
+  --color-primary: var(--color-primary-base);
+  --color-primary-deep: var(--color-primary-deep-base);
+  --color-primary-fg: var(--color-primary-fg-base);
+  --color-accent: var(--color-accent-base);
+  --color-accent-fg: var(--color-accent-fg-base);
+  --color-gold: var(--color-gold-base);
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-serif: var(--font-serif);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* ----------------------------------------------------------------
+   Animations as plain CSS classes (works reliably with Tailwind v4)
+   ---------------------------------------------------------------- */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slide-in-right {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes marquee-x {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-14px) rotate(2deg); }
+}
+
+@keyframes float-slower {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(10px) rotate(-3deg); }
+}
+
+.anim-fade-in {
+  animation: fade-in 220ms ease-out both;
+}
+
+.anim-slide-in-right {
+  animation: slide-in-right 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.anim-marquee {
+  animation: marquee-x 40s linear infinite;
+}
+
+.anim-float-slow {
+  animation: float-slow 8s ease-in-out infinite;
+}
+
+.anim-float-slower {
+  animation: float-slower 12s ease-in-out infinite;
+}
+
+.marquee-track:hover .anim-marquee {
+  animation-play-state: paused;
+}
+
+/* ----------------------------------------------------------------
+   Article / editor typography (used by .prose-editor and .prose-article)
+   ---------------------------------------------------------------- */
+.prose-editor, .prose-article {
+  color: var(--color-fg);
+  line-height: 1.7;
+  font-size: 16px;
+}
+.prose-editor :is(h2, h3),
+.prose-article :is(h2, h3) {
+  font-family: var(--font-serif), Georgia, serif;
+  font-weight: 500;
+  color: var(--color-fg);
+  letter-spacing: -0.01em;
+}
+.prose-editor h2, .prose-article h2 {
+  font-size: 1.6em;
+  margin: 1.6em 0 0.6em;
+  line-height: 1.2;
+}
+.prose-editor h3, .prose-article h3 {
+  font-size: 1.25em;
+  margin: 1.4em 0 0.4em;
+  line-height: 1.3;
+}
+.prose-editor p, .prose-article p {
+  margin: 0 0 1em;
+}
+.prose-editor :is(ul, ol),
+.prose-article :is(ul, ol) {
+  margin: 1em 0;
+  padding-left: 1.5em;
+}
+.prose-editor li, .prose-article li {
+  margin: 0.4em 0;
+}
+.prose-editor ul, .prose-article ul {
+  list-style: disc;
+}
+.prose-editor ol, .prose-article ol {
+  list-style: decimal;
+}
+.prose-editor blockquote,
+.prose-article blockquote {
+  border-left: 3px solid var(--color-primary);
+  padding: 0.4em 0 0.4em 1.2em;
+  margin: 1.4em 0;
+  font-style: italic;
+  color: var(--color-fg-muted);
+}
+.prose-editor a, .prose-article a {
+  color: var(--color-primary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.prose-editor strong, .prose-article strong {
+  font-weight: 600;
+}
+.prose-editor img, .prose-article img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 1.6em auto;
+  border-radius: 1rem;
+  border: 1px solid var(--color-border);
+}
+.prose-editor p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: var(--color-fg-muted);
+  pointer-events: none;
+  height: 0;
+}
+
+/* ----------------------------------------------------------------
+   Reveal-on-scroll: starts hidden, JS adds .is-visible
+   ---------------------------------------------------------------- */
+.reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 700ms cubic-bezier(0.22, 1, 0.36, 1),
+              transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+    transition: none;
   }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  .anim-fade-in,
+  .anim-slide-in-right,
+  .anim-marquee,
+  .anim-float-slow,
+  .anim-float-slower {
+    animation: none !important;
+  }
 }
