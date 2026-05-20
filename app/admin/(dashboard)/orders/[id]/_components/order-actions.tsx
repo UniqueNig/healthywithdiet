@@ -6,6 +6,7 @@ import {
   regenerateDownloadTokens,
   markRefunded,
 } from '../../_actions';
+import { ConfirmAction } from '../../../_components/confirm-action';
 
 export function OrderActions({ orderId }: { orderId: string }) {
   return (
@@ -20,47 +21,28 @@ export function OrderActions({ orderId }: { orderId: string }) {
         </button>
       </form>
 
-      <form
+      <ConfirmAction
         action={regenerateDownloadTokens.bind(null, orderId)}
-        onSubmit={(e) => {
-          if (
-            !window.confirm(
-              'Generate fresh download links and email them? Old links will stop working.',
-            )
-          ) {
-            e.preventDefault();
-          }
-        }}
+        title="Generate fresh download links?"
+        description="The customer will receive an email with brand-new links. Any link they currently have will stop working."
+        confirmLabel="Generate new links"
+        triggerClassName="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2 text-sm font-medium text-fg transition hover:border-primary hover:text-primary"
       >
-        <button
-          type="submit"
-          className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2 text-sm font-medium text-fg transition hover:border-primary hover:text-primary"
-        >
-          <RefreshCw size={14} />
-          Generate new links
-        </button>
-      </form>
+        <RefreshCw size={14} />
+        Generate new links
+      </ConfirmAction>
 
-      <form
+      <ConfirmAction
         action={markRefunded.bind(null, orderId)}
-        onSubmit={(e) => {
-          if (
-            !window.confirm(
-              'Mark this order as refunded? You must process the refund manually in Paystack first.',
-            )
-          ) {
-            e.preventDefault();
-          }
-        }}
+        title="Mark this order as refunded?"
+        description="This only updates the status flag here. You still need to process the actual refund in Paystack first."
+        confirmLabel="Mark refunded"
+        destructive
+        triggerClassName="inline-flex items-center gap-2 rounded-lg border border-red-200 bg-surface px-4 py-2 text-sm font-medium text-red-700 transition hover:bg-red-50"
       >
-        <button
-          type="submit"
-          className="inline-flex items-center gap-2 rounded-lg border border-red-200 bg-surface px-4 py-2 text-sm font-medium text-red-700 transition hover:bg-red-50"
-        >
-          <AlertOctagon size={14} />
-          Mark refunded
-        </button>
-      </form>
+        <AlertOctagon size={14} />
+        Mark refunded
+      </ConfirmAction>
     </div>
   );
 }

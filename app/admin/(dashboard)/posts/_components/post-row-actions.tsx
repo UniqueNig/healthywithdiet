@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { Eye, EyeOff, Pencil, Trash2 } from 'lucide-react';
 import { deletePost, togglePublish } from '../_actions';
+import { ConfirmAction } from '../../_components/confirm-action';
 
 const iconButton =
   'grid h-8 w-8 place-items-center rounded-md text-fg-muted transition-colors hover:bg-bg hover:text-fg';
@@ -38,27 +39,18 @@ export function PostRowActions({
         <Pencil size={16} />
       </Link>
 
-      <form
+      <ConfirmAction
         action={deletePost.bind(null, postId)}
-        onSubmit={(e) => {
-          if (
-            !window.confirm(
-              `Delete "${postTitle}"? This cannot be undone.`,
-            )
-          ) {
-            e.preventDefault();
-          }
-        }}
+        title={`Delete "${postTitle}"?`}
+        description="This cannot be undone."
+        confirmLabel="Delete"
+        destructive
+        triggerAriaLabel="Delete"
+        triggerTitle="Delete"
+        triggerClassName="grid h-8 w-8 place-items-center rounded-md text-fg-muted transition-colors hover:bg-red-50 hover:text-red-600"
       >
-        <button
-          type="submit"
-          aria-label="Delete"
-          title="Delete"
-          className="grid h-8 w-8 place-items-center rounded-md text-fg-muted transition-colors hover:bg-red-50 hover:text-red-600"
-        >
-          <Trash2 size={16} />
-        </button>
-      </form>
+        <Trash2 size={16} />
+      </ConfirmAction>
     </div>
   );
 }

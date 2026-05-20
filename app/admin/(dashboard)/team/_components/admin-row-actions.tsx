@@ -2,6 +2,7 @@
 
 import { Trash2 } from 'lucide-react';
 import { removeAdmin } from '../_actions';
+import { ConfirmAction } from '../../_components/confirm-action';
 
 export function AdminRowActions({
   adminId,
@@ -21,26 +22,17 @@ export function AdminRowActions({
   }
 
   return (
-    <form
+    <ConfirmAction
       action={removeAdmin.bind(null, adminId)}
-      onSubmit={(e) => {
-        if (
-          !window.confirm(
-            `Remove ${adminEmail} as an admin? They will lose all access immediately.`,
-          )
-        ) {
-          e.preventDefault();
-        }
-      }}
+      title={`Remove ${adminEmail}?`}
+      description="They will lose all admin access immediately. You can re-invite them later if needed."
+      confirmLabel="Remove admin"
+      destructive
+      triggerAriaLabel="Remove admin"
+      triggerTitle="Remove admin"
+      triggerClassName="grid h-8 w-8 place-items-center rounded-md text-fg-muted transition-colors hover:bg-red-50 hover:text-red-600"
     >
-      <button
-        type="submit"
-        aria-label="Remove admin"
-        title="Remove admin"
-        className="grid h-8 w-8 place-items-center rounded-md text-fg-muted transition-colors hover:bg-red-50 hover:text-red-600"
-      >
-        <Trash2 size={15} />
-      </button>
-    </form>
+      <Trash2 size={15} />
+    </ConfirmAction>
   );
 }
