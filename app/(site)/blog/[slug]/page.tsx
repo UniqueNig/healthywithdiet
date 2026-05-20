@@ -11,7 +11,12 @@ type Params = Promise<{ slug: string }>;
 export async function generateMetadata({ params }: { params: Params }) {
   const { slug } = await params;
   const rows = await db
-    .select({ title: posts.title, excerpt: posts.excerpt })
+    .select({
+      title: posts.title,
+      excerpt: posts.excerpt,
+      coverImageUrl: posts.coverImageUrl,
+      publishedAt: posts.publishedAt,
+    })
     .from(posts)
     .where(and(eq(posts.slug, slug), eq(posts.isPublished, true)))
     .limit(1);
@@ -20,6 +25,19 @@ export async function generateMetadata({ params }: { params: Params }) {
   return {
     title: p.title,
     description: p.excerpt ?? undefined,
+    openGraph: {
+      title: p.title,
+      description: p.excerpt ?? undefined,
+      type: 'article',
+      publishedTime: p.publishedAt?.toISOString(),
+      images: p.coverImageUrl ? [{ url: p.coverImageUrl }] : undefined,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: p.title,
+      description: p.excerpt ?? undefined,
+      images: p.coverImageUrl ? [p.coverImageUrl] : undefined,
+    },
   };
 }
 
@@ -77,8 +95,37 @@ export default async function ArticlePage({ params }: { params: Params }) {
 
   const readingMinutes = estimateReadingMinutes(post.content);
 
+  const baseUrl =
+    process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, '') ??
+    'http://localhost:3000';
+
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: post.title,
+    description: post.excerpt ?? undefined,
+    image: post.coverImageUrl ?? undefined,
+    datePublished: post.publishedAt?.toISOString(),
+    dateModified: post.publishedAt?.toISOString(),
+    author: { '@type': 'Person', name: 'Joy' },
+    publisher: {
+      '@type': 'Organization',
+      name: 'Healthy with Diet',
+      url: baseUrl,
+    },
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': `${baseUrl}/blog/${post.slug}`,
+    },
+    articleSection: post.categoryName ?? undefined,
+  };
+
   return (
     <div>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <section className="relative overflow-hidden border-b border-border">
         <DotGrid className="pointer-events-none absolute inset-0 text-primary/15" />
         <div className="pointer-events-none absolute -right-16 top-0 hidden h-72 w-72 text-primary/30 lg:block">

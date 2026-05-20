@@ -1,10 +1,18 @@
 'use client';
 
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { signIn } from '@/lib/auth/client';
 
 export default function AdminLoginPage() {
+  return (
+    <Suspense fallback={<LoginFallback />}>
+      <LoginForm />
+    </Suspense>
+  );
+}
+
+function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const nextPath = searchParams.get('next') ?? '/admin';
@@ -91,6 +99,22 @@ export default function AdminLoginPage() {
             </button>
           </div>
         </form>
+      </div>
+    </main>
+  );
+}
+
+function LoginFallback() {
+  return (
+    <main className="flex flex-1 items-center justify-center px-4 py-12">
+      <div className="w-full max-w-sm">
+        <div className="mb-8 text-center">
+          <h1 className="text-2xl font-semibold tracking-tight text-fg">
+            Healthy with Diet
+          </h1>
+          <p className="mt-1 text-sm text-fg-muted">Admin sign-in</p>
+        </div>
+        <div className="h-64 animate-pulse rounded-2xl border border-border bg-surface" />
       </div>
     </main>
   );

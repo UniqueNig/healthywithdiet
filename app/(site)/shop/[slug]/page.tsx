@@ -23,7 +23,11 @@ type Params = Promise<{ slug: string }>;
 export async function generateMetadata({ params }: { params: Params }) {
   const { slug } = await params;
   const rows = await db
-    .select({ title: products.title, description: products.description })
+    .select({
+      title: products.title,
+      description: products.description,
+      coverImageUrl: products.coverImageUrl,
+    })
     .from(products)
     .where(and(eq(products.slug, slug), eq(products.isPublished, true)))
     .limit(1);
@@ -32,6 +36,18 @@ export async function generateMetadata({ params }: { params: Params }) {
   return {
     title: p.title,
     description: p.description ?? undefined,
+    openGraph: {
+      title: p.title,
+      description: p.description ?? undefined,
+      type: 'website',
+      images: p.coverImageUrl ? [{ url: p.coverImageUrl }] : undefined,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: p.title,
+      description: p.description ?? undefined,
+      images: p.coverImageUrl ? [p.coverImageUrl] : undefined,
+    },
   };
 }
 
@@ -72,8 +88,41 @@ export default async function ProductDetailPage({ params }: { params: Params }) 
     .orderBy(desc(products.createdAt))
     .limit(3);
 
+  const baseUrl =
+    process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, '') ?? 'http://localhost:3000';
+
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: product.title,
+    description: product.description ?? undefined,
+    image: product.coverImageUrl ?? undefined,
+    category: product.categoryName ?? undefined,
+    brand: { '@type': 'Brand', name: 'Healthy with Diet' },
+    offers: [
+      {
+        '@type': 'Offer',
+        priceCurrency: 'NGN',
+        price: (product.priceNgnKobo / 100).toFixed(0),
+        availability: 'https://schema.org/InStock',
+        url: `${baseUrl}/shop/${product.slug}`,
+      },
+      {
+        '@type': 'Offer',
+        priceCurrency: 'USD',
+        price: (product.priceUsdCents / 100).toFixed(2),
+        availability: 'https://schema.org/InStock',
+        url: `${baseUrl}/shop/${product.slug}`,
+      },
+    ],
+  };
+
   return (
     <div>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <section className="relative overflow-hidden">
         <DotGrid className="pointer-events-none absolute inset-0 text-primary/15" />
         <div className="pointer-events-none absolute -right-20 bottom-0 hidden h-72 w-72 text-primary/30 lg:block">
