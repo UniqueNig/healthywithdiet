@@ -116,6 +116,9 @@ export async function createProduct(
 
     success = true;
     revalidatePath('/admin/products');
+    revalidatePath('/');
+    revalidatePath('/shop');
+    revalidatePath(`/shop/${slug}`);
   } catch (err: unknown) {
     return {
       ok: false,
@@ -195,6 +198,13 @@ export async function updateProduct(
     success = true;
     revalidatePath('/admin/products');
     revalidatePath(`/admin/products/${productId}/edit`);
+    revalidatePath('/');
+    revalidatePath('/shop');
+    revalidatePath(`/shop/${slug}`);
+    if (existing[0].slug !== slug) {
+      // slug changed, also bust the old URL
+      revalidatePath(`/shop/${existing[0].slug}`);
+    }
   } catch (err: unknown) {
     return {
       ok: false,
@@ -210,7 +220,7 @@ export async function togglePublish(productId: string, _formData: FormData) {
   await requireSession();
 
   const existing = await db
-    .select({ isPublished: products.isPublished })
+    .select({ isPublished: products.isPublished, slug: products.slug })
     .from(products)
     .where(eq(products.id, productId))
     .limit(1);
@@ -226,6 +236,9 @@ export async function togglePublish(productId: string, _formData: FormData) {
     .where(eq(products.id, productId));
 
   revalidatePath('/admin/products');
+  revalidatePath('/');
+  revalidatePath('/shop');
+  revalidatePath(`/shop/${existing[0].slug}`);
 }
 
 export async function deleteProduct(productId: string, _formData: FormData) {
@@ -248,4 +261,7 @@ export async function deleteProduct(productId: string, _formData: FormData) {
   }
 
   revalidatePath('/admin/products');
+  revalidatePath('/');
+  revalidatePath('/shop');
+  revalidatePath(`/shop/${existing[0].slug}`);
 }

@@ -89,6 +89,7 @@ export async function createPost(
     success = true;
     revalidatePath('/admin/posts');
     revalidatePath('/blog');
+    revalidatePath('/');
   } catch (err: unknown) {
     const message =
       err instanceof Error ? err.message : 'Failed to create post.';
@@ -165,6 +166,7 @@ export async function updatePost(
     revalidatePath(`/admin/posts/${postId}/edit`);
     revalidatePath('/blog');
     revalidatePath(`/blog/${slug}`);
+    revalidatePath('/');
   } catch (err: unknown) {
     const message =
       err instanceof Error ? err.message : 'Failed to update post.';
@@ -182,7 +184,11 @@ export async function togglePublish(postId: string, _formData: FormData) {
   await requireSession();
 
   const existing = await db
-    .select({ isPublished: posts.isPublished, publishedAt: posts.publishedAt })
+    .select({
+      isPublished: posts.isPublished,
+      publishedAt: posts.publishedAt,
+      slug: posts.slug,
+    })
     .from(posts)
     .where(eq(posts.id, postId))
     .limit(1);
@@ -203,6 +209,8 @@ export async function togglePublish(postId: string, _formData: FormData) {
 
   revalidatePath('/admin/posts');
   revalidatePath('/blog');
+  revalidatePath(`/blog/${existing[0].slug}`);
+  revalidatePath('/');
 }
 
 export async function uploadInlineImage(
@@ -243,4 +251,6 @@ export async function deletePost(postId: string, _formData: FormData) {
 
   revalidatePath('/admin/posts');
   revalidatePath('/blog');
+  revalidatePath(`/blog/${existing[0].slug}`);
+  revalidatePath('/');
 }
